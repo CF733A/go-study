@@ -1,0 +1,208 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Микросервис для поиска и геокодирования адресов через DaData.",
+        "title": "Геосервис API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/address/geocode": {
+            "post": {
+                "description": "Получение адреса по географическим координатам (широте и долготе) с использованием DaData.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geocode"
+                ],
+                "summary": "Обратное геокодирование",
+                "parameters": [
+                    {
+                        "description": "Географические координаты",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.GeocodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешный ответ",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.AddressResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/address/search": {
+            "post": {
+                "description": "Поиск адресов по строке запроса с использованием DaData.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "addresses"
+                ],
+                "summary": "Поиск адреса",
+                "parameters": [
+                    {
+                        "description": "Поисковый запрос",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.SearchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешный ответ",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.AddressResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.AddressResponse": {
+            "type": "object",
+            "properties": {
+                "city_area": {
+                    "description": "Район города",
+                    "type": "string",
+                    "example": "Северо-восточный административный округ"
+                },
+                "city_district": {
+                    "description": "Внутригородской район",
+                    "type": "string",
+                    "example": "район Северное Медведково"
+                },
+                "country": {
+                    "description": "Страна",
+                    "type": "string",
+                    "example": "Россия"
+                },
+                "geo_lat": {
+                    "description": "Географическая широта",
+                    "type": "string",
+                    "example": "55.877857"
+                },
+                "geo_lon": {
+                    "description": "Географическая долгота",
+                    "type": "string",
+                    "example": "37.653672"
+                },
+                "house": {
+                    "description": "Дом",
+                    "type": "string",
+                    "example": "11"
+                },
+                "postal_code": {
+                    "description": "Почтовый индекс",
+                    "type": "string",
+                    "example": "127642"
+                },
+                "region": {
+                    "description": "Регион",
+                    "type": "string",
+                    "example": "Москва"
+                },
+                "result": {
+                    "description": "Полный адрес",
+                    "type": "string",
+                    "example": "г Москва, ул Сухонская, д 11"
+                },
+                "source": {
+                    "description": "Источник данных",
+                    "type": "string",
+                    "example": "dadata"
+                },
+                "street": {
+                    "description": "Улица",
+                    "type": "string",
+                    "example": "улица Сухонская"
+                }
+            }
+        },
+        "main.GeocodeRequest": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "description": "Широта",
+                    "type": "string",
+                    "example": "55.7558"
+                },
+                "lng": {
+                    "description": "Долгота",
+                    "type": "string",
+                    "example": "37.6173"
+                }
+            }
+        },
+        "main.SearchRequest": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "description": "Строка поиска адреса",
+                    "type": "string",
+                    "example": "москва сухонская 11"
+                }
+            }
+        }
+    }
+}

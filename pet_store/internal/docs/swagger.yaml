@@ -1,0 +1,974 @@
+basePath: /
+definitions:
+  auth.LoginRequest:
+    description: User authentication request payload
+    properties:
+      password:
+        description: Password for login
+        example: password123
+        type: string
+      username:
+        description: Username for login
+        example: john_doe
+        type: string
+    type: object
+  auth.LoginResponse:
+    description: JWT token response after successful login
+    properties:
+      token:
+        description: JWT access token
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      type:
+        description: Token type
+        example: Bearer
+        type: string
+    type: object
+  entities.Category:
+    description: Business entity for pet category classification
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Dogs
+        type: string
+    type: object
+  entities.OrderStatus:
+    enum:
+    - placed
+    - approved
+    - delivered
+    type: string
+    x-enum-varnames:
+    - StatusPlaced
+    - StatusApproved
+    - StatusDelivered
+  entities.Pet:
+    properties:
+      category:
+        $ref: '#/definitions/entities.Category'
+      id:
+        type: integer
+      name:
+        type: string
+      photoUrls:
+        items:
+          type: string
+        type: array
+      status:
+        $ref: '#/definitions/entities.PetStatus'
+      tags:
+        items:
+          $ref: '#/definitions/entities.Tag'
+        type: array
+    type: object
+  entities.PetStatus:
+    enum:
+    - available
+    - pending
+    - sold
+    type: string
+    x-enum-varnames:
+    - StatusAvailable
+    - StatusPending
+    - StatusSold
+  entities.Tag:
+    description: Business entity for pet labeling and categorization
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: friendly
+        type: string
+    type: object
+  entities.User:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      phone:
+        type: string
+      userStatus:
+        type: integer
+      username:
+        type: string
+    type: object
+  home.HomeResponse:
+    description: Service information response structure
+    properties:
+      documentation:
+        example: http://localhost:8080/swagger/
+        type: string
+      message:
+        example: Добро пожаловать в PetStore
+        type: string
+      service:
+        example: pet-store
+        type: string
+      status:
+        example: ok
+        type: string
+    type: object
+  order.CreateOrderRequest:
+    description: Request payload for creating a new pet store order
+    properties:
+      complete:
+        example: false
+        type: boolean
+      petId:
+        example: 123
+        type: integer
+      quantity:
+        example: 1
+        type: integer
+      shipDate:
+        example: "2023-12-31T15:04:05Z"
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/entities.OrderStatus'
+        example: approved
+    type: object
+  order.CreateOrderResponse:
+    description: Response structure containing created order details
+    properties:
+      complete:
+        example: false
+        type: boolean
+      id:
+        example: 1
+        type: integer
+      petId:
+        example: 123
+        type: integer
+      quantity:
+        example: 1
+        type: integer
+      shipDate:
+        example: "2023-12-31T15:04:05Z"
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/entities.OrderStatus'
+        example: approved
+    type: object
+  order.GetOrderResponse:
+    description: Response structure containing complete order information
+    properties:
+      complete:
+        example: false
+        type: boolean
+      id:
+        example: 1
+        type: integer
+      petId:
+        example: 123
+        type: integer
+      quantity:
+        example: 1
+        type: integer
+      shipDate:
+        example: "2023-12-31T15:04:05Z"
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/entities.OrderStatus'
+        example: approved
+      userId:
+        example: 456
+        type: integer
+    type: object
+  order.InventoryResponse:
+    description: Response structure containing inventory counts by status
+    properties:
+      available:
+        example: 100
+        type: integer
+      pending:
+        example: 15
+        type: integer
+      sold:
+        example: 235
+        type: integer
+    type: object
+  pet.CreatePetRequest:
+    description: Request payload for creating a new pet in the store
+    properties:
+      category:
+        $ref: '#/definitions/entities.Category'
+      name:
+        example: doggie
+        type: string
+      photoUrls:
+        example:
+        - '["https://example.com/photo1.jpg"'
+        - '"https://example.com/photo2.jpg"]'
+        items:
+          type: string
+        type: array
+      status:
+        allOf:
+        - $ref: '#/definitions/entities.PetStatus'
+        example: available
+      tags:
+        items:
+          $ref: '#/definitions/entities.Tag'
+        type: array
+    type: object
+  pet.UpdatePetRequest:
+    description: Request payload for updating pet details
+    properties:
+      category:
+        $ref: '#/definitions/entities.Category'
+      id:
+        example: 1
+        type: integer
+      name:
+        example: doggie
+        type: string
+      photoUrls:
+        example:
+        - '["https://example.com/photo1.jpg"'
+        - '"https://example.com/photo2.jpg"]'
+        items:
+          type: string
+        type: array
+      status:
+        allOf:
+        - $ref: '#/definitions/entities.PetStatus'
+        example: available
+      tags:
+        items:
+          $ref: '#/definitions/entities.Tag'
+        type: array
+    type: object
+  pet.UploadImageRequest:
+    description: Request payload for uploading a pet image URL
+    properties:
+      imageUrl:
+        example: https://example.com/pet-image.jpg
+        type: string
+    type: object
+  response.Response:
+    description: Unified response structure for all API responses
+    properties:
+      data: {}
+      error:
+        example: Error message
+        type: string
+      message:
+        example: Success
+        type: string
+      status:
+        example: true
+        type: boolean
+    type: object
+  user.CreateUserRequest:
+    description: Request payload for creating a new user
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      firstName:
+        example: John
+        type: string
+      lastName:
+        example: Doe
+        type: string
+      password:
+        example: password123
+        type: string
+      phone:
+        example: "+1234567890"
+        type: string
+      username:
+        example: john_doe
+        type: string
+    type: object
+  user.CreateUserResponse:
+    description: Response structure containing created user details
+    properties:
+      id:
+        example: 1
+        type: integer
+      message:
+        example: user created successfully
+        type: string
+      username:
+        example: john_doe
+        type: string
+    type: object
+  user.CreateUsersResponse:
+    description: Response structure containing created users details
+    properties:
+      count:
+        example: 2
+        type: integer
+      message:
+        example: users created successfully
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/user.UserShort'
+        type: array
+    type: object
+  user.UserShort:
+    description: Short user information structure
+    properties:
+      id:
+        example: 1
+        type: integer
+      username:
+        example: john_doe
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    name: API Support
+    url: http://localhost:8080
+  description: REST API for PetStore application with user authentication and pet
+    management
+  title: PetStore API
+  version: "0.1"
+paths:
+  /:
+    get:
+      description: Returns service information in JSON or plain text format based
+        on Accept header
+      produces:
+      - application/json
+      - text/plain
+      responses:
+        "200":
+          description: Service information in plain text format
+          schema:
+            type: string
+      summary: API Home page
+      tags:
+      - info
+  /pet:
+    post:
+      consumes:
+      - application/json
+      description: Add a new pet with the provided details
+      parameters:
+      - description: Pet object that needs to be added
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/pet.CreatePetRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Pet created successfully
+          schema:
+            $ref: '#/definitions/entities.Pet'
+        "400":
+          description: Invalid input or missing required fields
+          schema:
+            $ref: '#/definitions/response.Response'
+        "405":
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Add a new pet to the store
+      tags:
+      - pet
+    put:
+      consumes:
+      - application/json
+      description: Update pet details by ID
+      parameters:
+      - description: Pet object with updated details
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/pet.UpdatePetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pet updated successfully
+          schema:
+            $ref: '#/definitions/entities.Pet'
+        "400":
+          description: Invalid ID supplied or invalid input
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Pet not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "405":
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update an existing pet
+      tags:
+      - pet
+  /pet/{petId}:
+    delete:
+      description: Deletes a pet by ID
+      parameters:
+      - description: Pet ID to delete
+        format: int64
+        in: path
+        name: petId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pet deleted successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid ID supplied
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Pet not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete a pet
+      tags:
+      - pet
+    get:
+      description: Returns a single pet by ID
+      parameters:
+      - description: ID of pet to return
+        format: int64
+        in: path
+        name: petId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/entities.Pet'
+        "400":
+          description: Invalid ID supplied
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Pet not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Find pet by ID
+      tags:
+      - pet
+    post:
+      consumes:
+      - multipart/form-data
+      description: Update pet name and/or status using form data
+      parameters:
+      - description: ID of pet that needs to be updated
+        format: int64
+        in: path
+        name: petId
+        required: true
+        type: integer
+      - description: Updated name of the pet
+        in: formData
+        name: name
+        type: string
+      - description: Updated status of the pet
+        in: formData
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pet updated successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Pet not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "405":
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Updates a pet in the store with form data
+      tags:
+      - pet
+  /pet/{petId}/uploadImage:
+    post:
+      consumes:
+      - application/json
+      description: Add an image URL to a pet's photo gallery
+      parameters:
+      - description: ID of pet to update
+        format: int64
+        in: path
+        name: petId
+        required: true
+        type: integer
+      - description: Image URL object
+        in: body
+        name: image
+        required: true
+        schema:
+          $ref: '#/definitions/pet.UploadImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Image uploaded successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Pet not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "405":
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Uploads an image for a pet
+      tags:
+      - pet
+  /pet/findByStatus:
+    get:
+      description: Multiple status values can be provided with comma separated strings
+      parameters:
+      - description: Status values that need to be considered for filter
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            items:
+              $ref: '#/definitions/entities.Pet'
+            type: array
+        "400":
+          description: Invalid status value
+          schema:
+            $ref: '#/definitions/response.Response'
+        "405":
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Finds pets by status
+      tags:
+      - pet
+  /store/inventory:
+    get:
+      description: Returns a map of status codes to quantities
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              format: int32
+              type: integer
+            type: object
+      summary: Returns pet inventories by status
+      tags:
+      - store
+  /store/order:
+    post:
+      consumes:
+      - application/json
+      description: Place a new order in the store
+      parameters:
+      - description: Order data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/order.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Order created successfully
+          schema:
+            $ref: '#/definitions/order.CreateOrderResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Pet not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Place an order for a pet
+      tags:
+      - store
+  /store/order/{orderId}:
+    delete:
+      description: Delete order by order ID
+      parameters:
+      - description: Order ID
+        format: int64
+        in: path
+        name: orderId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order deleted successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid order ID
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete purchase order by ID
+      tags:
+      - store
+    get:
+      description: Get order details by order ID
+      parameters:
+      - description: Order ID
+        format: int64
+        in: path
+        name: orderId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order details
+          schema:
+            $ref: '#/definitions/order.GetOrderResponse'
+        "400":
+          description: Invalid order ID
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Find purchase order by ID
+      tags:
+      - store
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the provided details
+      parameters:
+      - description: User object that needs to be created
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/user.CreateUserResponse'
+        "400":
+          description: Invalid input or missing required fields
+          schema:
+            $ref: '#/definitions/response.Response'
+        "405":
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new user
+      tags:
+      - user
+  /user/{username}:
+    delete:
+      description: Delete user by username
+      parameters:
+      - description: The username that needs to be deleted
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deleted successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid username supplied
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Delete user by username
+      tags:
+      - user
+    get:
+      description: Returns a single user by username
+      parameters:
+      - description: The name that needs to be fetched
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/entities.User'
+        "400":
+          description: Invalid username supplied
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get user by username
+      tags:
+      - user
+  /user/createWithArray:
+    post:
+      consumes:
+      - application/json
+      description: Creates list of users with given input array
+      parameters:
+      - description: Array of user objects
+        in: body
+        name: users
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/user.CreateUserRequest'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.CreateUsersResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Creates list of users with given input array
+      tags:
+      - user
+  /user/createWithList:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple users with the provided details
+      parameters:
+      - description: Array of user objects that need to be created
+        in: body
+        name: users
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/user.CreateUserRequest'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Users created successfully
+          schema:
+            $ref: '#/definitions/user.CreateUsersResponse'
+        "400":
+          description: Invalid input or missing required fields
+          schema:
+            $ref: '#/definitions/response.Response'
+        "405":
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Username already exists
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create multiple users
+      tags:
+      - user
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with credentials and return JWT token
+      parameters:
+      - description: User login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully authenticated
+          schema:
+            $ref: '#/definitions/auth.LoginResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Invalid username or password
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User login
+      tags:
+      - authentication
+  /user/logout:
+    get:
+      description: Revoke user's JWT token to end session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully logged out
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid or missing token
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: User logout
+      tags:
+      - authentication
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    description: JWT Token
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

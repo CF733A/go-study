@@ -1,0 +1,352 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API для работы с адресами и геокодированием",
+        "title": "Geo Service API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/": {
+            "get": {
+                "description": "Возвращает приветственное сообщение",
+                "tags": [
+                    "main"
+                ],
+                "summary": "Главная страница",
+                "responses": {
+                    "200": {
+                        "description": "Добро пожаловать на главную страницу",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/address/geocode": {
+            "post": {
+                "description": "Преобразует широту и долготу в адрес",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geocode"
+                ],
+                "summary": "Геокодирование координат",
+                "parameters": [
+                    {
+                        "description": "Координаты для геокодирования",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GeocodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешный ответ с адресами",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.AddressResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный формат запроса",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/address/search": {
+            "post": {
+                "description": "Ищет адрес по текстовому запросу",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "address"
+                ],
+                "summary": "Поиск адреса",
+                "parameters": [
+                    {
+                        "description": "Поисковый запрос",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SearchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешный ответ с адресами",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.AddressResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный формат запроса",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "description": "Проверяет логин/пароль и возвращает JWT токен",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Аутентификация пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные для входа",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.AuthRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешный вход или ошибка аутентификации",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "405": {
+                        "description": "Метод не разрешен",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "description": "Создает аккаунт пользователя и возвращает JWT токен",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Регистрация нового пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные для регистрации",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.AuthRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешная регистрация",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.AddressResponse": {
+            "type": "object",
+            "properties": {
+                "city_area": {
+                    "description": "Район города",
+                    "type": "string",
+                    "example": "Северо-восточный административный округ"
+                },
+                "city_district": {
+                    "description": "Внутригородской район",
+                    "type": "string",
+                    "example": "район Северное Медведково"
+                },
+                "country": {
+                    "description": "Страна",
+                    "type": "string",
+                    "example": "Россия"
+                },
+                "geo_lat": {
+                    "description": "Географическая широта",
+                    "type": "string",
+                    "example": "55.877857"
+                },
+                "geo_lon": {
+                    "description": "Географическая долгота",
+                    "type": "string",
+                    "example": "37.653672"
+                },
+                "house": {
+                    "description": "Дом",
+                    "type": "string",
+                    "example": "11"
+                },
+                "postal_code": {
+                    "description": "Почтовый индекс",
+                    "type": "string",
+                    "example": "127642"
+                },
+                "region": {
+                    "description": "Регион",
+                    "type": "string",
+                    "example": "Москва"
+                },
+                "result": {
+                    "description": "Полный адрес",
+                    "type": "string",
+                    "example": "г Москва, ул Сухонская, д 11"
+                },
+                "source": {
+                    "description": "Источник данных",
+                    "type": "string",
+                    "example": "dadata"
+                },
+                "street": {
+                    "description": "Улица",
+                    "type": "string",
+                    "example": "улица Сухонская"
+                }
+            }
+        },
+        "handlers.AuthRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "password123"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "user123"
+                }
+            }
+        },
+        "handlers.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "handlers.GeocodeRequest": {
+            "type": "object",
+            "properties": {
+                "lat": {
+                    "description": "Широта",
+                    "type": "string",
+                    "example": "55.7558"
+                },
+                "lng": {
+                    "description": "Долгота",
+                    "type": "string",
+                    "example": "37.6173"
+                }
+            }
+        },
+        "handlers.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "user not found"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "handlers.SearchRequest": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "description": "Строка поиска адреса",
+                    "type": "string",
+                    "example": "москва сухонская 11"
+                }
+            }
+        }
+    }
+}

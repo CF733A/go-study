@@ -1,0 +1,265 @@
+basePath: /
+definitions:
+  user.CreateUserRequest:
+    description: Запрос на создание пользователя
+    properties:
+      email:
+        example: ivan@example.com
+        type: string
+      name:
+        example: Иван Иванов
+        type: string
+    type: object
+  user.ErrorResponse:
+    description: Стандартный ответ об ошибке
+    properties:
+      code:
+        example: 400
+        type: integer
+      error:
+        example: Bad Request
+        type: string
+      message:
+        example: Invalid request parameters
+        type: string
+    type: object
+  user.UpdateUserRequest:
+    description: Запрос на обновление пользователя
+    properties:
+      email:
+        example: ivan@example.com
+        type: string
+      name:
+        example: Иван Иванов
+        type: string
+    type: object
+  user.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      isDeleted:
+        type: boolean
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  user.UserListResponse:
+    description: Ответ со списком пользователей
+    properties:
+      limit:
+        example: 10
+        type: integer
+      offset:
+        example: 0
+        type: integer
+      total:
+        example: 100
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/user.UserResponse'
+        type: array
+    type: object
+  user.UserResponse:
+    description: Ответ с данными пользователя
+    properties:
+      created_at:
+        type: string
+      email:
+        example: ivan@example.com
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Иван Иванов
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://localhost:8080
+  description: REST API для управления пользователями с PostgreSQL и автоматическими
+    миграциями
+  title: User Management API
+  version: "1.0"
+paths:
+  /api/users:
+    get:
+      description: Возвращает список пользователей с пагинацией
+      parameters:
+      - default: 10
+        description: Лимит (макс. 100)
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - default: 0
+        description: Смещение
+        in: query
+        minimum: 0
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список пользователей
+          schema:
+            $ref: '#/definitions/user.UserListResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Получить список пользователей
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Создает нового пользователя с указанными именем и email
+      parameters:
+      - description: Данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Пользователь создан
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "409":
+          description: Пользователь с таким email уже существует
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Создать пользователя
+      tags:
+      - users
+  /api/users/{id}:
+    delete:
+      description: Выполняет мягкое удаление пользователя (soft delete)
+      parameters:
+      - description: UUID пользователя
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Сообщение об успешном удалении
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный UUID
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "404":
+          description: Пользователь не найден
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Удалить пользователя
+      tags:
+      - users
+    get:
+      description: Возвращает пользователя по его UUID
+      parameters:
+      - description: UUID пользователя
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Данные пользователя
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Неверный UUID
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "404":
+          description: Пользователь не найден
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Получить пользователя
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Обновляет имя и email пользователя
+      parameters:
+      - description: UUID пользователя
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Новые данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленные данные пользователя
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "404":
+          description: Пользователь не найден
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Обновить пользователя
+      tags:
+      - users
+schemes:
+- http
+swagger: "2.0"

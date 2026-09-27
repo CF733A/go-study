@@ -1,0 +1,344 @@
+basePath: /
+definitions:
+  auth.LoginRequest:
+    properties:
+      password:
+        example: securepassword123
+        type: string
+      username:
+        example: john_doe
+        type: string
+    type: object
+  auth.LoginResponse:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  auth.RegisterRequest:
+    properties:
+      password:
+        example: securepassword123
+        type: string
+      username:
+        example: john_doe
+        type: string
+    type: object
+  auth.RegisterResponse:
+    properties:
+      message:
+        example: user created successfully
+        type: string
+    type: object
+  geo.AddressResponseDTO:
+    properties:
+      city_area:
+        example: Северо-восточный
+        type: string
+      city_district:
+        example: Северное Медведково
+        type: string
+      country:
+        example: Россия
+        type: string
+      geo_lat:
+        example: 55.8782557
+        type: number
+      geo_lon:
+        example: 37.65372
+        type: number
+      house:
+        example: "11"
+        type: string
+      postal_code:
+        example: "127642"
+        type: string
+      region:
+        example: Москва
+        type: string
+      result:
+        example: г Москва, ул Сухонская, д 11
+        type: string
+      source:
+        example: москва сухонская 11
+        type: string
+      street:
+        example: Сухонская
+        type: string
+    type: object
+  geo.GeocodeRequestDTO:
+    properties:
+      lat:
+        example: "55.7558"
+        type: string
+      lng:
+        example: "37.6173"
+        type: string
+    type: object
+  geo.GeocodeResponseDTO:
+    properties:
+      suggestions:
+        items:
+          $ref: '#/definitions/geo.SuggestionDTO'
+        type: array
+    type: object
+  geo.SearchRequestDTO:
+    properties:
+      query:
+        example: Москва, Красная площадь
+        type: string
+    type: object
+  geo.SearchResponseDTO:
+    properties:
+      addresses:
+        items:
+          $ref: '#/definitions/geo.AddressResponseDTO'
+        type: array
+    type: object
+  geo.SuggestionDTO:
+    properties:
+      data:
+        $ref: '#/definitions/geo.SuggestionDataDTO'
+      unrestricted_value:
+        example: г Москва, ул Сухонская, д 11
+        type: string
+      value:
+        example: г Москва, ул Сухонская, д 11
+        type: string
+    type: object
+  geo.SuggestionDataDTO:
+    properties:
+      city_area:
+        example: Северо-восточный
+        type: string
+      city_district:
+        example: Северное Медведково
+        type: string
+      country:
+        example: Россия
+        type: string
+      geo_lat:
+        example: 55.8782557
+        type: number
+      geo_lon:
+        example: 37.65372
+        type: number
+      house:
+        example: "11"
+        type: string
+      postal_code:
+        example: "127642"
+        type: string
+      region:
+        example: Москва
+        type: string
+      street:
+        example: Сухонская
+        type: string
+    type: object
+  home.HomeResponse:
+    properties:
+      documentation:
+        type: string
+      endpoints:
+        additionalProperties:
+          type: string
+        type: object
+      message:
+        type: string
+      service:
+        type: string
+      status:
+        type: string
+    type: object
+  responder.Response:
+    properties:
+      data: {}
+      error:
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@geo-service.com
+    name: API Support
+    url: http://localhost:8080
+  description: Сервис для геокодирования адресов с аутентификацией JWT
+  title: GEO Service API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Возвращает информацию о сервисе в JSON или текстовом формате
+      produces:
+      - application/json
+      - text/plain
+      responses:
+        "200":
+          description: Информация о сервисе в текстовом формате
+          schema:
+            type: string
+      summary: Главная страница API
+      tags:
+      - info
+  /api/address/geocode:
+    post:
+      consumes:
+      - application/json
+      description: 'Обратное геокодирование: преобразование координат в адрес'
+      parameters:
+      - description: Координаты для поиска
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/geo.GeocodeRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное геокодирование
+          schema:
+            allOf:
+            - $ref: '#/definitions/responder.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/geo.GeocodeResponseDTO'
+              type: object
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/responder.Response'
+        "401":
+          description: Неавторизован
+          schema:
+            $ref: '#/definitions/responder.Response'
+        "500":
+          description: Ошибка геокодирования
+          schema:
+            $ref: '#/definitions/responder.Response'
+      security:
+      - BearerAuth: []
+      summary: Поиск адреса по координатам
+      tags:
+      - geo
+  /api/address/search:
+    post:
+      consumes:
+      - application/json
+      description: 'Прямое геокодирование: преобразование адреса в координаты'
+      parameters:
+      - description: Адрес для поиска
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/geo.SearchRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный поиск
+          schema:
+            allOf:
+            - $ref: '#/definitions/responder.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/geo.SearchResponseDTO'
+              type: object
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/responder.Response'
+        "401":
+          description: Неавторизован
+          schema:
+            $ref: '#/definitions/responder.Response'
+        "500":
+          description: Ошибка геокодирования
+          schema:
+            $ref: '#/definitions/responder.Response'
+      security:
+      - BearerAuth: []
+      summary: Поиск координат по адресу
+      tags:
+      - geo
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: Вход в систему и получение JWT токена
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная аутентификация
+          schema:
+            allOf:
+            - $ref: '#/definitions/responder.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.LoginResponse'
+              type: object
+        "400":
+          description: Неверные учетные данные
+          schema:
+            $ref: '#/definitions/responder.Response'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/responder.Response'
+      summary: Аутентификация пользователя
+      tags:
+      - auth
+  /api/register:
+    post:
+      consumes:
+      - application/json
+      description: Создание нового пользователя в системе
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная регистрация
+          schema:
+            allOf:
+            - $ref: '#/definitions/responder.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.RegisterResponse'
+              type: object
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/responder.Response'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/responder.Response'
+      summary: Регистрация пользователя
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    description: 'Введите: Bearer {JWT_TOKEN}'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

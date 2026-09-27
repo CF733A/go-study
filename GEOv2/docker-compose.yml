@@ -1,0 +1,10 @@
+services:
+  geoservice:
+    build: .
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - PORT=${PORT}
+      - DADATA_API_KEY=${DADATA_API_KEY}
+      - DADATA_SECRET_KEY=${DADATA_SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
